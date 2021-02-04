@@ -1,0 +1,95 @@
+﻿@{
+	ViewData["Title"] = "Home Page";
+}
+
+<select class="custom-select" id="selectNombre" name="selectNombre">
+	<option value="Daquan">Daquan</option>
+	<option value="Prescott">Prescott</option>
+	<option value="Wing">Wing</option>
+	<option value="Allistair">Allistair</option>
+</select>
+
+<br />
+
+<label for="radioRiesgo">
+	<input type="radio" name="radioRiesgo" class="form-check" value="Alto" />
+	Alto
+</label>
+<label for="radioRiesgo">
+	<input type="radio" name="radioRiesgo" class="form-check" value="Medio" />
+	Medio
+</label>
+
+<br />
+
+<label for="radioIncidencia">
+	<input type="radio" name="radioIncidencia" class="form-check" value="Vencidas" />
+	Vencidas
+</label>
+<label for="radioIncidencia">
+	<input type="radio" name="radioIncidencia" class="form-check" value="Por vencer" />
+	Por vencer
+</label>
+
+<button class="btn btn-success" type="submit" onclick="TraerData();">Verificar</button>
+
+<table class="table">
+	<thead>
+		<tr>
+			<td>Id</td>
+			<td>Nombre</td>
+			<td>Email</td>
+			<td>ZIP</td>
+			<td>Fecha</td>
+			<td>Incidencias</td>
+			<td>Alto</td>
+			<td>Medio</td>
+		</tr>
+	</thead>
+
+	<tbody id="tableBody">
+	</tbody>
+</table>
+
+<script>
+
+	function TraerData() {
+		var nombre = $("#selectNombre :selected").val();
+		var incidencia = $("input[name=radioIncidencia]:checked").val();
+		var riesgo = $("input[name=radioRiesgo]:checked").val();
+
+		$.ajax({
+			url: 'https://localhost:44390/api/Rapid/GetFilter?nombre=' + nombre +
+				'&incidencias=' + incidencia + '&riesgo=' + riesgo,
+			type: 'GET',
+			success: function (data) {
+				FillTable(data);
+			}
+		});
+	}
+
+	function FillTable(data) {
+		for (var i = 0; i < data.datos.length; i++) {
+			var row = "<tr>";
+			row += "<td>" + data.datos[i].id + "</td>";
+			row += "<td>" + data.datos[i].nombre + "</td>";
+			row += "<td>" + data.datos[i].email + "</td>";
+			row += "<td>" + data.datos[i].zip + "</td>";
+			row += "<td>" + data.datos[i].fecha + "</td>";
+			row += "<td>" + data.datos[i].incidencias + "</td>";
+
+			if (data.datos[i].riesgo == "Alto") {
+				row += "<td>" + 1 + "</td>";
+				row += "<td>" + 0 + "</td>";
+			}
+			else if (data.datos[i].riesgo == "Medio") {
+				row += "<td>" + 0 + "</td>";
+				row += "<td>" + 1 + "</td>";
+			}
+
+			row += "</tr>";
+
+			$("#tableBody").append(row);
+		}
+	}
+</script>
